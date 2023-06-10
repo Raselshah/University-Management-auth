@@ -31,9 +31,11 @@ const creatSemesterFromDB = catchAsync(
 
 const getAllSemesters = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    const filters = pick(req.query, ['searchTearm']);
     const paginationOption = pick(req.query, paginatonField);
 
     const result = await academicSemesterService.getAllSemester(
+      filters,
       paginationOption
     );
 

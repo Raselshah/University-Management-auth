@@ -20,8 +20,8 @@ async function run() {
     server = app.listen(config.port, () => {
       logger.info(`Example app listening on port ${config.port}`);
     });
-  } catch (err) {
-    errorLoger.error(`faild database connect ${err}`);
+  } catch (error) {
+    errorLoger.error(`faild database connect ${error}`);
   }
 
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled

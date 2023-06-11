@@ -46,7 +46,7 @@ const getAllSemester = async (
       })),
     });
   }
-  console.log('filtersData', filtersData);
+
   if (Object?.keys(filtersData)?.length) {
     andCondition.push({
       $and: Object.entries(filtersData).map(([field, value]) => ({
@@ -131,9 +131,18 @@ const updateSemester = async (
 
   return result;
 };
+
+const deleteSemester = async (
+  id: string
+): Promise<IAcademicSemester | null> => {
+  const result = await AcademicSemester.findByIdAndDelete(id);
+
+  return result;
+};
 export const academicSemesterService = {
   createSemester,
   getAllSemester,
   getSingleSemester,
   updateSemester,
+  deleteSemester,
 };

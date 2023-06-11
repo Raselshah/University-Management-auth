@@ -23,5 +23,13 @@ export type IAcademicSemester = {
 };
 
 export type IAcademicSemesterFilters = {
-  searchTearm: string;
+  searchTearm?: string;
+  filtersData?: string;
 };
+
+export const academicSemesterFitarableFields = [
+  'searchTearm',
+  'title',
+  'code',
+  'year',
+];

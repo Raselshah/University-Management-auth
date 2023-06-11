@@ -5,7 +5,10 @@ import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelpers';
 import { IGenericRessponse } from '../../../interfaces/common';
 import { IPaginationOption } from '../../../interfaces/pagination';
-import { academicSemesterTitleWrapper } from './academicSemester.constant';
+import {
+  academicSemesterSearchableFields,
+  academicSemesterTitleWrapper,
+} from './academicSemester.constant';
 import {
   IAcademicSemester,
   IAcademicSemesterFilters,
@@ -27,10 +30,9 @@ const getAllSemester = async (
   paginationOption: IPaginationOption
 ): Promise<IGenericRessponse<IAcademicSemester[]>> => {
   // searching query parameters
-  const { searchTearm } = filters;
+  const { searchTearm, ...filtersData } = filters;
 
   // sort  first set for the search
-  const academicSemesterSearchableFields = ['title', 'code', 'year'];
 
   const andCondition = [];
 
@@ -41,6 +43,14 @@ const getAllSemester = async (
           $regex: searchTearm,
           $options: 'i',
         },
+      })),
+    });
+  }
+  console.log('filtersData', filtersData);
+  if (Object?.keys(filtersData)?.length) {
+    andCondition.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
       })),
     });
   }
@@ -78,7 +88,9 @@ const getAllSemester = async (
   if (sortBy && sortOrder) {
     sortConditions[sortBy] = sortOrder;
   }
-  const result = await AcademicSemester.find({ $and: andCondition })
+
+  const whereCondition = andCondition?.length > 0 ? { $and: andCondition } : {};
+  const result = await AcademicSemester.find(whereCondition)
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
@@ -95,7 +107,14 @@ const getAllSemester = async (
   };
 };
 
+const getSingleSemester = async (
+  id: string
+): Promise<IAcademicSemester | null> => {
+  const result = await AcademicSemester.findById(id);
+  return result;
+};
 export const academicSemesterService = {
   createSemester,
   getAllSemester,
+  getSingleSemester,
 };

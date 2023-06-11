@@ -4,7 +4,10 @@ import { paginatonField } from '../../../constance/pagination';
 import catchAsync from '../../../shared/createAsync';
 import pick from '../../../shared/pick';
 import sendResponse from '../../../shared/sendResponse';
-import { IAcademicSemester } from './academicSemester.interface';
+import {
+  academicSemesterFitarableFields,
+  IAcademicSemester,
+} from './academicSemester.interface';
 import { academicSemesterService } from './academicSemester.service';
 const creatSemesterFromDB = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -29,22 +32,35 @@ const creatSemesterFromDB = catchAsync(
   }
 );
 
-const getAllSemesters = catchAsync(
+const getAllSemesters = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, academicSemesterFitarableFields);
+  const paginationOptions = pick(req.query, paginatonField);
+
+  const result = await academicSemesterService.getAllSemester(
+    filters,
+    paginationOptions
+  );
+
+  sendResponse<IAcademicSemester[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Semesters retrieved successfully !',
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+const getSingleSemester = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const filters = pick(req.query, ['searchTearm']);
-    const paginationOption = pick(req.query, paginatonField);
+    const id = req.params.id;
 
-    const result = await academicSemesterService.getAllSemester(
-      filters,
-      paginationOption
-    );
+    const result = await academicSemesterService.getSingleSemester(id);
 
-    sendResponse<IAcademicSemester[]>(res, {
+    sendResponse<IAcademicSemester>(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Successfully get all semesters',
-      meta: result.meta,
-      data: result.data,
+      message: 'Semesters retrieved successfully !',
+      data: result,
     });
     next();
   }
@@ -52,4 +68,5 @@ const getAllSemesters = catchAsync(
 export const AcademicSemesterController = {
   creatSemesterFromDB,
   getAllSemesters,
+  getSingleSemester,
 };
